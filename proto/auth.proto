@@ -1,0 +1,45 @@
+syntax="proto3";
+
+package proto;
+
+option go_package = "internal/api/auth";
+
+service AuthService{
+  rpc Register(AuthRequest) returns (RegisterResponse);
+  rpc Login(AuthRequest) returns (LoginResponse);
+  rpc ValidateToken(TokenRequest) returns (ValidateResponse);
+  rpc RefreshToken(TokenRequest) returns (RefreshResponse);
+  rpc ParseToken(TokenRequest) returns  (ParseResponse);
+}
+
+message AuthRequest{
+  string login = 1;
+  string password = 2;
+}
+
+message TokenRequest{
+  string token = 1;
+}
+
+message ValidateResponse{
+  bool success = 1;
+}
+
+message RefreshResponse{
+  bool success = 1;
+  string token = 2;
+}
+
+message RegisterResponse{
+  bool success = 1;
+}
+
+message LoginResponse{
+  bool success = 1;
+  string token = 2;
+}
+
+message ParseResponse{
+  string uid = 1;
+  string login = 2;
+}

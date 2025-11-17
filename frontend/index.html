@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Авторизация + Хранилище</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="auth">
+    <h2>Вход</h2>
+    <input id="login" placeholder="Логин" autocomplete="username" />
+    <input id="password" type="password" placeholder="Пароль" autocomplete="current-password" />
+    <button id="btnLogin">Войти</button>
+    <button id="btnRegister">Зарегистрироваться</button>
+    <div id="error" class="error"></div>
+</div>
+
+<div id="storage" style="display:none;">
+    <h2>Облачное хранилище</h2>
+    <input type="file" id="fileInput" />
+    <button id="uploadBtn">Загрузить файл</button>
+    <button id="logoutBtn">Выйти</button>
+
+    <table id="filesTable">
+        <thead>
+        <tr>
+            <th>Название</th>
+            <th>Тип</th>
+            <th>Размер (КБ)</th>
+            <th>Дата создания</th>
+            <th>Дата обновления</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="message" class="message"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
