@@ -7,11 +7,13 @@
 package storage
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	_ "google.golang.org/genproto/googleapis/api/annotations"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -89,6 +91,50 @@ func (x *UploadRequest) GetData() []byte {
 	return nil
 }
 
+type TokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TokenRequest) Reset() {
+	*x = TokenRequest{}
+	mi := &file_proto_storage_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TokenRequest) ProtoMessage() {}
+
+func (x *TokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_storage_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TokenRequest.ProtoReflect.Descriptor instead.
+func (*TokenRequest) Descriptor() ([]byte, []int) {
+	return file_proto_storage_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TokenRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
 type FileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
@@ -99,7 +145,7 @@ type FileRequest struct {
 
 func (x *FileRequest) Reset() {
 	*x = FileRequest{}
-	mi := &file_proto_storage_proto_msgTypes[1]
+	mi := &file_proto_storage_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -111,7 +157,7 @@ func (x *FileRequest) String() string {
 func (*FileRequest) ProtoMessage() {}
 
 func (x *FileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_storage_proto_msgTypes[1]
+	mi := &file_proto_storage_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -124,7 +170,7 @@ func (x *FileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileRequest.ProtoReflect.Descriptor instead.
 func (*FileRequest) Descriptor() ([]byte, []int) {
-	return file_proto_storage_proto_rawDescGZIP(), []int{1}
+	return file_proto_storage_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *FileRequest) GetToken() string {
@@ -141,29 +187,28 @@ func (x *FileRequest) GetFileID() string {
 	return ""
 }
 
-type DownloadResponse struct {
+type SuccessResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Data          []byte                 `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DownloadResponse) Reset() {
-	*x = DownloadResponse{}
-	mi := &file_proto_storage_proto_msgTypes[2]
+func (x *SuccessResponse) Reset() {
+	*x = SuccessResponse{}
+	mi := &file_proto_storage_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *DownloadResponse) String() string {
+func (x *SuccessResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DownloadResponse) ProtoMessage() {}
+func (*SuccessResponse) ProtoMessage() {}
 
-func (x *DownloadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_storage_proto_msgTypes[2]
+func (x *SuccessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_storage_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -174,47 +219,92 @@ func (x *DownloadResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DownloadResponse.ProtoReflect.Descriptor instead.
-func (*DownloadResponse) Descriptor() ([]byte, []int) {
-	return file_proto_storage_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use SuccessResponse.ProtoReflect.Descriptor instead.
+func (*SuccessResponse) Descriptor() ([]byte, []int) {
+	return file_proto_storage_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *DownloadResponse) GetSuccess() bool {
+func (x *SuccessResponse) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
 	return false
 }
 
-func (x *DownloadResponse) GetData() []byte {
+type GetFileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Meta          *FileMetadata          `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
+	Data          []byte                 `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFileResponse) Reset() {
+	*x = GetFileResponse{}
+	mi := &file_proto_storage_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFileResponse) ProtoMessage() {}
+
+func (x *GetFileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_storage_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFileResponse.ProtoReflect.Descriptor instead.
+func (*GetFileResponse) Descriptor() ([]byte, []int) {
+	return file_proto_storage_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetFileResponse) GetMeta() *FileMetadata {
+	if x != nil {
+		return x.Meta
+	}
+	return nil
+}
+
+func (x *GetFileResponse) GetData() []byte {
 	if x != nil {
 		return x.Data
 	}
 	return nil
 }
 
-type ResultResponse struct {
+type GetFilesResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Meta          []*FileMetadata        `protobuf:"bytes,1,rep,name=meta,proto3" json:"meta,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ResultResponse) Reset() {
-	*x = ResultResponse{}
-	mi := &file_proto_storage_proto_msgTypes[3]
+func (x *GetFilesResponse) Reset() {
+	*x = GetFilesResponse{}
+	mi := &file_proto_storage_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ResultResponse) String() string {
+func (x *GetFilesResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ResultResponse) ProtoMessage() {}
+func (*GetFilesResponse) ProtoMessage() {}
 
-func (x *ResultResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_storage_proto_msgTypes[3]
+func (x *GetFilesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_storage_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -225,42 +315,156 @@ func (x *ResultResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ResultResponse.ProtoReflect.Descriptor instead.
-func (*ResultResponse) Descriptor() ([]byte, []int) {
-	return file_proto_storage_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use GetFilesResponse.ProtoReflect.Descriptor instead.
+func (*GetFilesResponse) Descriptor() ([]byte, []int) {
+	return file_proto_storage_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *ResultResponse) GetSuccess() bool {
+func (x *GetFilesResponse) GetMeta() []*FileMetadata {
 	if x != nil {
-		return x.Success
+		return x.Meta
 	}
-	return false
+	return nil
+}
+
+type FileMetadata struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileID        string                 `protobuf:"bytes,1,opt,name=fileID,proto3" json:"fileID,omitempty"`
+	UserID        string                 `protobuf:"bytes,2,opt,name=userID,proto3" json:"userID,omitempty"`
+	FileName      string                 `protobuf:"bytes,3,opt,name=fileName,proto3" json:"fileName,omitempty"`
+	MimeType      string                 `protobuf:"bytes,4,opt,name=mimeType,proto3" json:"mimeType,omitempty"`
+	Size          int64                  `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty"`
+	Location      string                 `protobuf:"bytes,6,opt,name=location,proto3" json:"location,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FileMetadata) Reset() {
+	*x = FileMetadata{}
+	mi := &file_proto_storage_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileMetadata) ProtoMessage() {}
+
+func (x *FileMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_storage_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileMetadata.ProtoReflect.Descriptor instead.
+func (*FileMetadata) Descriptor() ([]byte, []int) {
+	return file_proto_storage_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *FileMetadata) GetFileID() string {
+	if x != nil {
+		return x.FileID
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetUserID() string {
+	if x != nil {
+		return x.UserID
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetMimeType() string {
+	if x != nil {
+		return x.MimeType
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *FileMetadata) GetLocation() string {
+	if x != nil {
+		return x.Location
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
 }
 
 var File_proto_storage_proto protoreflect.FileDescriptor
 
 const file_proto_storage_proto_rawDesc = "" +
 	"\n" +
-	"\x13proto/storage.proto\x12\x05proto\"q\n" +
+	"\x13proto/storage.proto\x12\astorage\x1a\x1cgoogle/api/annotations.proto\"q\n" +
 	"\rUploadRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
 	"\bfileName\x18\x02 \x01(\tR\bfileName\x12\x1a\n" +
 	"\bmimeType\x18\x03 \x01(\tR\bmimeType\x12\x12\n" +
-	"\x04data\x18\x04 \x01(\fR\x04data\";\n" +
+	"\x04data\x18\x04 \x01(\fR\x04data\"$\n" +
+	"\fTokenRequest\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\";\n" +
 	"\vFileRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x16\n" +
-	"\x06fileID\x18\x02 \x01(\tR\x06fileID\"@\n" +
-	"\x10DownloadResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x12\n" +
-	"\x04data\x18\x02 \x01(\fR\x04data\"*\n" +
-	"\x0eResultResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xc1\x01\n" +
-	"\x0eStorageService\x129\n" +
+	"\x06fileID\x18\x02 \x01(\tR\x06fileID\"+\n" +
+	"\x0fSuccessResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"P\n" +
+	"\x0fGetFileResponse\x12)\n" +
+	"\x04meta\x18\x01 \x01(\v2\x15.storage.FileMetadataR\x04meta\x12\x12\n" +
+	"\x04data\x18\x02 \x01(\fR\x04data\"=\n" +
+	"\x10GetFilesResponse\x12)\n" +
+	"\x04meta\x18\x01 \x03(\v2\x15.storage.FileMetadataR\x04meta\"\xe2\x01\n" +
+	"\fFileMetadata\x12\x16\n" +
+	"\x06fileID\x18\x01 \x01(\tR\x06fileID\x12\x16\n" +
+	"\x06userID\x18\x02 \x01(\tR\x06userID\x12\x1a\n" +
+	"\bfileName\x18\x03 \x01(\tR\bfileName\x12\x1a\n" +
+	"\bmimeType\x18\x04 \x01(\tR\bmimeType\x12\x12\n" +
+	"\x04size\x18\x05 \x01(\x03R\x04size\x12\x1a\n" +
+	"\blocation\x18\x06 \x01(\tR\blocation\x12\x1c\n" +
+	"\tcreatedAt\x18\a \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\b \x01(\tR\tupdatedAt2\x88\x03\n" +
+	"\x0eStorageService\x12^\n" +
 	"\n" +
-	"UploadFile\x12\x14.proto.UploadRequest\x1a\x15.proto.ResultResponse\x12;\n" +
-	"\fDownloadFile\x12\x12.proto.FileRequest\x1a\x17.proto.DownloadResponse\x127\n" +
+	"UploadFile\x12\x16.storage.UploadRequest\x1a\x18.storage.SuccessResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/storage/uploadFile\x12V\n" +
+	"\aGetFile\x12\x14.storage.FileRequest\x1a\x18.storage.GetFileResponse\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/storage/getFile\x12\\\n" +
 	"\n" +
-	"DeleteFile\x12\x12.proto.FileRequest\x1a\x15.proto.ResultResponseB\x16Z\x14internal/api/storageb\x06proto3"
+	"DeleteFile\x12\x14.storage.FileRequest\x1a\x18.storage.SuccessResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/storage/deleteFile\x12`\n" +
+	"\vGetAllFiles\x12\x15.storage.TokenRequest\x1a\x19.storage.GetFilesResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/storage/getAllFilesB\x16Z\x14internal/api/storageb\x06proto3"
 
 var (
 	file_proto_storage_proto_rawDescOnce sync.Once
@@ -274,25 +478,32 @@ func file_proto_storage_proto_rawDescGZIP() []byte {
 	return file_proto_storage_proto_rawDescData
 }
 
-var file_proto_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_proto_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_proto_storage_proto_goTypes = []any{
-	(*UploadRequest)(nil),    // 0: proto.UploadRequest
-	(*FileRequest)(nil),      // 1: proto.FileRequest
-	(*DownloadResponse)(nil), // 2: proto.DownloadResponse
-	(*ResultResponse)(nil),   // 3: proto.ResultResponse
+	(*UploadRequest)(nil),    // 0: storage.UploadRequest
+	(*TokenRequest)(nil),     // 1: storage.TokenRequest
+	(*FileRequest)(nil),      // 2: storage.FileRequest
+	(*SuccessResponse)(nil),  // 3: storage.SuccessResponse
+	(*GetFileResponse)(nil),  // 4: storage.GetFileResponse
+	(*GetFilesResponse)(nil), // 5: storage.GetFilesResponse
+	(*FileMetadata)(nil),     // 6: storage.FileMetadata
 }
 var file_proto_storage_proto_depIdxs = []int32{
-	0, // 0: proto.StorageService.UploadFile:input_type -> proto.UploadRequest
-	1, // 1: proto.StorageService.DownloadFile:input_type -> proto.FileRequest
-	1, // 2: proto.StorageService.DeleteFile:input_type -> proto.FileRequest
-	3, // 3: proto.StorageService.UploadFile:output_type -> proto.ResultResponse
-	2, // 4: proto.StorageService.DownloadFile:output_type -> proto.DownloadResponse
-	3, // 5: proto.StorageService.DeleteFile:output_type -> proto.ResultResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	6, // 0: storage.GetFileResponse.meta:type_name -> storage.FileMetadata
+	6, // 1: storage.GetFilesResponse.meta:type_name -> storage.FileMetadata
+	0, // 2: storage.StorageService.UploadFile:input_type -> storage.UploadRequest
+	2, // 3: storage.StorageService.GetFile:input_type -> storage.FileRequest
+	2, // 4: storage.StorageService.DeleteFile:input_type -> storage.FileRequest
+	1, // 5: storage.StorageService.GetAllFiles:input_type -> storage.TokenRequest
+	3, // 6: storage.StorageService.UploadFile:output_type -> storage.SuccessResponse
+	4, // 7: storage.StorageService.GetFile:output_type -> storage.GetFileResponse
+	3, // 8: storage.StorageService.DeleteFile:output_type -> storage.SuccessResponse
+	5, // 9: storage.StorageService.GetAllFiles:output_type -> storage.GetFilesResponse
+	6, // [6:10] is the sub-list for method output_type
+	2, // [2:6] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_proto_storage_proto_init() }
@@ -306,7 +517,7 @@ func file_proto_storage_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_storage_proto_rawDesc), len(file_proto_storage_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

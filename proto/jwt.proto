@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package jwt;
+
+option go_package = "internal/api/jwt";
+
+import "google/api/annotations.proto";
+
+service JwtService {
+  rpc RefreshToken(TokenRequest) returns (TokenResponse){
+    option (google.api.http) = {
+      post: "/jwt/refreshToken"
+      body: "*"
+    };
+  }
+  rpc ValidateToken(TokenRequest) returns (ValidateResponse);
+  rpc GenerateToken(GenerateRequest) returns (TokenResponse);
+}
+
+message TokenRequest{
+  string token = 1;
+}
+
+message GenerateRequest{
+  string login = 1;
+  string uid = 2;
+  string tokenType = 3;
+}
+
+message TokenResponse{
+  string token = 1;
+}
+
+message ValidateResponse{
+  bool success = 1;
+  Claims claims = 2;
+}
+
+message Claims {
+  string uid = 1;
+  string login = 2;
+}

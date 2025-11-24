@@ -1,7 +1,7 @@
 package storage
 
 import (
-	proto "File_Storage/internal/api/auth"
+	proto "File_Storage/internal/api/jwt"
 	"context"
 	"errors"
 	"os"
@@ -18,12 +18,12 @@ type Service interface {
 }
 
 type service struct {
-	authClient proto.AuthServiceClient
-	repo       Repository
+	jwtClient proto.JwtServiceClient
+	repo      Repository
 }
 
-func NewService(repo Repository, client proto.AuthServiceClient) Service {
-	return &service{repo: repo, authClient: client}
+func NewService(repo Repository, client proto.JwtServiceClient) Service {
+	return &service{repo: repo, jwtClient: client}
 }
 
 func (s *service) UploadFile(token, filename, mimeType string, data []byte) error {
@@ -45,13 +45,13 @@ func (s *service) UploadFile(token, filename, mimeType string, data []byte) erro
 
 	meta := FileMetadata{
 		FileID:    uuid.NewString(),
-		UserID:    response.Uid,
+		UserID:    response.Claims.Uid,
 		FileName:  filename,
 		MimeType:  mimeType,
 		Size:      int64(len(data)),
 		Location:  path,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Format(time.DateTime),
+		UpdatedAt: time.Now().Format(time.DateTime),
 	}
 
 	return s.repo.SaveFile(meta)
@@ -65,7 +65,7 @@ func (s *service) GetFile(token, fileID string) (FileMetadata, []byte, error) {
 	}
 
 	request := Request{
-		UserID: response.Uid,
+		UserID: response.Claims.Uid,
 		FileID: fileID,
 	}
 
@@ -92,7 +92,7 @@ func (s *service) DeleteFile(token, fileID string) error {
 	}
 
 	request := Request{
-		UserID: response.Uid,
+		UserID: response.Claims.Uid,
 		FileID: fileID,
 	}
 
@@ -116,9 +116,9 @@ func (s *service) GetAllFiles(token string) ([]FileMetadata, error) {
 		return nil, errors.New("could not parse token")
 	}
 
-	return s.repo.GetFiles(response.Uid)
+	return s.repo.GetFiles(response.Claims.Uid)
 }
 
-func (s *service) ParseToken(ctx context.Context, token string) (*proto.ParseResponse, error) {
-	return s.authClient.ParseToken(ctx, &proto.TokenRequest{Token: token})
+func (s *service) ParseToken(ctx context.Context, token string) (*proto.ValidateResponse, error) {
+	return s.jwtClient.ValidateToken(ctx, &proto.TokenRequest{Token: token})
 }

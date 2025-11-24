@@ -13,9 +13,10 @@ const uploadBtn = document.getElementById('uploadBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const filesTableBody = document.querySelector('#filesTable tbody');
 
-let token = localStorage.getItem('token');
-let auth_api = "http://localhost:8082"
-let storage_api = "http://localhost:8081"
+let access = localStorage.getItem('access');
+let refresh = localStorage.getItem('refresh');
+let auth_api = "http://localhost:8082/auth";
+let storage_api = "http://localhost:8085/storage";
 
 function showError(msg) {
     errorDiv.textContent = msg;
@@ -54,8 +55,7 @@ async function login() {
         showError('Введите логин и пароль');
         return;
     }
-    try
-    {
+    try {
         const res = await fetch(auth_api + '/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -67,16 +67,19 @@ async function login() {
 
         const data = await res.json();
 
-        if (!data.token)
-            throw new Error('Токен не получен');
+        if (!data.access)
+            throw new Error('access Токен не получен');
 
-        token = data.token;
-        localStorage.setItem('token', token);
+        if (!data.refresh)
+            throw new Error('refresh Токен не получен');
+
+        access = data.access;
+        refresh = data.refresh;
+        localStorage.setItem('access', access);
+        localStorage.setItem('refresh', refresh);
 
         showStorage();
-    }
-    catch (e)
-    {
+    } catch (e) {
         showError(e.message);
     }
 }
@@ -108,25 +111,24 @@ async function register() {
     } catch (e) {
         showError(e.message);
     }
-};
+}
 
 async function fetchFiles() {
     clearMessage();
-    try
-    {
-        const res = await fetch(storage_api + '/GetFiles?token=' + token, {
-            headers: {'Authorization': 'Bearer ' + token}
+    try {
+        const res = await fetch(storage_api + '/getAllFiles',{
+            method: 'POST',
+            headers: {'Authorization': 'Bearer ' + access},
+            body: JSON.stringify({ "token": access })
         });
 
         if (!res.ok)
             throw new Error('Ошибка загрузки списка файлов');
 
-        const files = await res.json();
+        const response = await res.json();
 
-        renderFiles(files);
-    }
-    catch (e)
-    {
+        renderFiles(response.meta);
+    } catch (e) {
         showMessage(e.message);
     }
 }
@@ -136,15 +138,15 @@ function renderFiles(files) {
     files.forEach(f => {
         const tr = document.createElement('tr');
 
-        tr.appendChild(document.createElement('td')).textContent = f.filename;
-        tr.appendChild(document.createElement('td')).textContent = f.mime_type;
+        tr.appendChild(document.createElement('td')).textContent = f.fileName;
+        tr.appendChild(document.createElement('td')).textContent = f.mimeType;
         tr.appendChild(document.createElement('td')).textContent = formatSize(f.size);
-        tr.appendChild(document.createElement('td')).textContent = formatDate(f.created_at);
-        tr.appendChild(document.createElement('td')).textContent = formatDate(f.updated_at);
+        tr.appendChild(document.createElement('td')).textContent = formatDate(f.createdAt);
+        tr.appendChild(document.createElement('td')).textContent = formatDate(f.updatedAt);
 
         const actionsTd = document.createElement('td');
-        actionsTd.appendChild(createButton('Скачать', () => downloadFile(f.file_id)));
-        actionsTd.appendChild(createButton('Удалить', () => deleteFile(f.file_id)));
+        actionsTd.appendChild(createButton('Скачать', () => downloadFile(f.fileID)));
+        actionsTd.appendChild(createButton('Удалить', () => deleteFile(f.fileID)));
         tr.appendChild(actionsTd);
 
         filesTableBody.appendChild(tr);
@@ -154,44 +156,47 @@ function renderFiles(files) {
 async function downloadFile(fileID) {
     clearMessage();
 
-    try
-    {
-        const res = await fetch(storage_api + '/DownloadFile', {
+    try {
+        const res = await fetch(storage_api + '/getFile', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({token, file_id: fileID})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: access, fileID })
         });
 
         if (!res.ok)
             throw new Error('Ошибка скачивания файла');
 
-        const blob = await res.blob();
+        const json = await res.json();
+
+        if (!json.meta || !json.data)
+            throw new Error('Неверный формат ответа');
+
+        const base64data = json.data;
+        const filename = json.meta.fileName || 'file';
+
+        const byteCharacters = atob(base64data);
+        const byteNumbers = new Array(byteCharacters.length);
+
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: json.meta.mimeType });
+
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
-
-        let filename = 'file';
-        const disposition = res.headers.get('Content-Disposition');
-        console.log("0")
-        console.log(disposition)
-        if (disposition && disposition.includes('filename=')) {
-            console.log("1")
-            const filenameMatch = disposition.match(/filename="?([^"]+)"?/);
-            if (filenameMatch.length > 1) {
-                console.log("2")
-                filename = filenameMatch[1];
-            }
-        }
 
         a.href = url;
         a.download = filename;
         a.click();
 
         window.URL.revokeObjectURL(url);
-    } catch (e)
-    {
+    } catch (e) {
         showMessage(e.message);
     }
 }
+
 
 async function deleteFile(fileID) {
     clearMessage();
@@ -199,21 +204,18 @@ async function deleteFile(fileID) {
     if (!confirm('Удалить файл?'))
         return;
 
-    try
-    {
-        const res = await fetch(storage_api + '/DeleteFile', {
-            method: 'DELETE',
+    try {
+        const res = await fetch(storage_api + '/deleteFile', {
+            method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({token, file_id: fileID})
+            body: JSON.stringify({token: access, fileID: fileID})
         });
 
         if (!res.ok)
             throw new Error('Ошибка удаления файла');
 
         await fetchFiles();
-    }
-    catch (e)
-    {
+    } catch (e) {
         showMessage(e.message);
     }
 }
@@ -221,20 +223,27 @@ async function deleteFile(fileID) {
 uploadBtn.onclick = async () => {
     clearMessage();
     const file = fileInput.files[0];
-    if (!file)
-    {
+    if (!file) {
         showMessage('Выберите файл для загрузки');
         return;
     }
-    try
-    {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('token', token);
 
-        const res = await fetch(storage_api + '/UploadFile', {
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        const base64Data = uint8ToBase64(uint8Array);
+
+        const json = JSON.stringify({
+            token: access,
+            fileName: file.name,
+            mimeType: file.type,
+            data: base64Data
+        });
+
+        const res = await fetch(storage_api + '/uploadFile', {
             method: 'POST',
-            body: formData
+            headers: { 'Content-Type': 'application/json' },
+            body: json
         });
 
         if (!res.ok)
@@ -243,17 +252,31 @@ uploadBtn.onclick = async () => {
         fileInput.value = '';
 
         await fetchFiles();
-    }
-    catch (e)
-    {
+    } catch (e) {
         showMessage(e.message);
     }
 };
 
-logoutBtn.onclick = () => {
 
-    localStorage.removeItem('token');
-    token = null;
+function uint8ToBase64(u8Arr) {
+    const CHUNK_SIZE = 0x8000; // 32768
+    let index = 0;
+    const length = u8Arr.length;
+    let result = '';
+    let slice;
+    while (index < length) {
+        slice = u8Arr.subarray(index, Math.min(index + CHUNK_SIZE, length));
+        result += String.fromCharCode.apply(null, slice);
+        index += CHUNK_SIZE;
+    }
+    return btoa(result);
+}
+
+logoutBtn.onclick = () => {
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    access = null;
+    refresh = null;
     storageDiv.style.display = 'none';
     authDiv.style.display = 'block';
 
@@ -267,7 +290,7 @@ function showStorage() {
     fetchFiles();
 }
 
-if (token) {
+if (access) {
     showStorage();
 }
 

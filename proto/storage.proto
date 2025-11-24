@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package storage;
+
+option go_package = "internal/api/storage";
+
+import "google/api/annotations.proto";
+
+service StorageService{
+  rpc UploadFile(UploadRequest) returns (SuccessResponse){
+    option(google.api.http) = {
+      post: "/storage/uploadFile"
+      body: "*"
+    };
+  }
+  rpc GetFile(FileRequest) returns (GetFileResponse){
+    option(google.api.http) = {
+      post: "/storage/getFile"
+      body: "*"
+    };
+  }
+  rpc DeleteFile(FileRequest) returns (SuccessResponse){
+    option(google.api.http) = {
+      post: "/storage/deleteFile"
+      body: "*"
+    };
+  }
+  rpc GetAllFiles(TokenRequest) returns (GetFilesResponse){
+    option(google.api.http) = {
+      post: "/storage/getAllFiles"
+      body: "*"
+    };
+  }
+}
+
+message UploadRequest{
+  string token = 1;
+  string fileName = 2;
+  string mimeType = 3;
+  bytes data = 4;
+}
+
+message TokenRequest{
+  string token = 1;
+}
+
+message FileRequest{
+  string token = 1;
+  string fileID = 2;
+}
+
+message SuccessResponse{
+  bool success = 1;
+}
+
+message GetFileResponse{
+  FileMetadata meta = 1;
+  bytes data = 2;
+}
+
+message GetFilesResponse{
+  repeated FileMetadata meta = 1;
+}
+
+message FileMetadata{
+  string    fileID = 1;
+  string    userID = 2;
+  string    fileName = 3;
+  string    mimeType = 4;
+  int64     size = 5;
+  string    location = 6;
+  string    createdAt = 7;
+  string    updatedAt = 8;
+}

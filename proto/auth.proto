@@ -1,15 +1,24 @@
 syntax="proto3";
 
-package proto;
+package auth;
 
 option go_package = "internal/api/auth";
 
+import "google/api/annotations.proto";
+
 service AuthService{
-  rpc Register(AuthRequest) returns (RegisterResponse);
-  rpc Login(AuthRequest) returns (LoginResponse);
-  rpc ValidateToken(TokenRequest) returns (ValidateResponse);
-  rpc RefreshToken(TokenRequest) returns (RefreshResponse);
-  rpc ParseToken(TokenRequest) returns  (ParseResponse);
+  rpc Register(AuthRequest) returns (RegisterResponse){
+    option (google.api.http) = {
+      post: "/auth/register"
+      body: "*"
+    };
+  }
+  rpc Login(AuthRequest) returns (LoginResponse){
+    option (google.api.http) = {
+      post: "/auth/login"
+      body: "*"
+    };
+  }
 }
 
 message AuthRequest{
@@ -21,25 +30,11 @@ message TokenRequest{
   string token = 1;
 }
 
-message ValidateResponse{
-  bool success = 1;
-}
-
-message RefreshResponse{
-  bool success = 1;
-  string token = 2;
-}
-
 message RegisterResponse{
   bool success = 1;
 }
 
 message LoginResponse{
-  bool success = 1;
-  string token = 2;
-}
-
-message ParseResponse{
-  string uid = 1;
-  string login = 2;
+  string refresh = 1;
+  string access = 2;
 }

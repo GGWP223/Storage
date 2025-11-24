@@ -19,11 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Register_FullMethodName      = "/proto.AuthService/Register"
-	AuthService_Login_FullMethodName         = "/proto.AuthService/Login"
-	AuthService_ValidateToken_FullMethodName = "/proto.AuthService/ValidateToken"
-	AuthService_RefreshToken_FullMethodName  = "/proto.AuthService/RefreshToken"
-	AuthService_ParseToken_FullMethodName    = "/proto.AuthService/ParseToken"
+	AuthService_Register_FullMethodName = "/auth.AuthService/Register"
+	AuthService_Login_FullMethodName    = "/auth.AuthService/Login"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -32,9 +29,6 @@ const (
 type AuthServiceClient interface {
 	Register(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	ValidateToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
-	RefreshToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*RefreshResponse, error)
-	ParseToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*ParseResponse, error)
 }
 
 type authServiceClient struct {
@@ -65,45 +59,12 @@ func (c *authServiceClient) Login(ctx context.Context, in *AuthRequest, opts ...
 	return out, nil
 }
 
-func (c *authServiceClient) ValidateToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*ValidateResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ValidateResponse)
-	err := c.cc.Invoke(ctx, AuthService_ValidateToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authServiceClient) RefreshToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*RefreshResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RefreshResponse)
-	err := c.cc.Invoke(ctx, AuthService_RefreshToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authServiceClient) ParseToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*ParseResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ParseResponse)
-	err := c.cc.Invoke(ctx, AuthService_ParseToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
 type AuthServiceServer interface {
 	Register(context.Context, *AuthRequest) (*RegisterResponse, error)
 	Login(context.Context, *AuthRequest) (*LoginResponse, error)
-	ValidateToken(context.Context, *TokenRequest) (*ValidateResponse, error)
-	RefreshToken(context.Context, *TokenRequest) (*RefreshResponse, error)
-	ParseToken(context.Context, *TokenRequest) (*ParseResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -119,15 +80,6 @@ func (UnimplementedAuthServiceServer) Register(context.Context, *AuthRequest) (*
 }
 func (UnimplementedAuthServiceServer) Login(context.Context, *AuthRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
-}
-func (UnimplementedAuthServiceServer) ValidateToken(context.Context, *TokenRequest) (*ValidateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ValidateToken not implemented")
-}
-func (UnimplementedAuthServiceServer) RefreshToken(context.Context, *TokenRequest) (*RefreshResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
-}
-func (UnimplementedAuthServiceServer) ParseToken(context.Context, *TokenRequest) (*ParseResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ParseToken not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -186,65 +138,11 @@ func _AuthService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).ValidateToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthService_ValidateToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).ValidateToken(ctx, req.(*TokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AuthService_RefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).RefreshToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthService_RefreshToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).RefreshToken(ctx, req.(*TokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AuthService_ParseToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).ParseToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthService_ParseToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).ParseToken(ctx, req.(*TokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AuthService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.AuthService",
+	ServiceName: "auth.AuthService",
 	HandlerType: (*AuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -254,18 +152,6 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _AuthService_Login_Handler,
-		},
-		{
-			MethodName: "ValidateToken",
-			Handler:    _AuthService_ValidateToken_Handler,
-		},
-		{
-			MethodName: "RefreshToken",
-			Handler:    _AuthService_RefreshToken_Handler,
-		},
-		{
-			MethodName: "ParseToken",
-			Handler:    _AuthService_ParseToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

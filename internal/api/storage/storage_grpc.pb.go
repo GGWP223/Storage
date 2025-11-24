@@ -8,6 +8,7 @@ package storage
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,18 +20,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	StorageService_UploadFile_FullMethodName   = "/proto.StorageService/UploadFile"
-	StorageService_DownloadFile_FullMethodName = "/proto.StorageService/DownloadFile"
-	StorageService_DeleteFile_FullMethodName   = "/proto.StorageService/DeleteFile"
+	StorageService_UploadFile_FullMethodName  = "/storage.StorageService/UploadFile"
+	StorageService_GetFile_FullMethodName     = "/storage.StorageService/GetFile"
+	StorageService_DeleteFile_FullMethodName  = "/storage.StorageService/DeleteFile"
+	StorageService_GetAllFiles_FullMethodName = "/storage.StorageService/GetAllFiles"
 )
 
 // StorageServiceClient is the client API for StorageService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StorageServiceClient interface {
-	UploadFile(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*ResultResponse, error)
-	DownloadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*DownloadResponse, error)
-	DeleteFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*ResultResponse, error)
+	UploadFile(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	GetFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*GetFileResponse, error)
+	DeleteFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	GetAllFiles(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*GetFilesResponse, error)
 }
 
 type storageServiceClient struct {
@@ -41,9 +44,9 @@ func NewStorageServiceClient(cc grpc.ClientConnInterface) StorageServiceClient {
 	return &storageServiceClient{cc}
 }
 
-func (c *storageServiceClient) UploadFile(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*ResultResponse, error) {
+func (c *storageServiceClient) UploadFile(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ResultResponse)
+	out := new(SuccessResponse)
 	err := c.cc.Invoke(ctx, StorageService_UploadFile_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -51,20 +54,30 @@ func (c *storageServiceClient) UploadFile(ctx context.Context, in *UploadRequest
 	return out, nil
 }
 
-func (c *storageServiceClient) DownloadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*DownloadResponse, error) {
+func (c *storageServiceClient) GetFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*GetFileResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DownloadResponse)
-	err := c.cc.Invoke(ctx, StorageService_DownloadFile_FullMethodName, in, out, cOpts...)
+	out := new(GetFileResponse)
+	err := c.cc.Invoke(ctx, StorageService_GetFile_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *storageServiceClient) DeleteFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*ResultResponse, error) {
+func (c *storageServiceClient) DeleteFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ResultResponse)
+	out := new(SuccessResponse)
 	err := c.cc.Invoke(ctx, StorageService_DeleteFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *storageServiceClient) GetAllFiles(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*GetFilesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetFilesResponse)
+	err := c.cc.Invoke(ctx, StorageService_GetAllFiles_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +88,10 @@ func (c *storageServiceClient) DeleteFile(ctx context.Context, in *FileRequest, 
 // All implementations must embed UnimplementedStorageServiceServer
 // for forward compatibility.
 type StorageServiceServer interface {
-	UploadFile(context.Context, *UploadRequest) (*ResultResponse, error)
-	DownloadFile(context.Context, *FileRequest) (*DownloadResponse, error)
-	DeleteFile(context.Context, *FileRequest) (*ResultResponse, error)
+	UploadFile(context.Context, *UploadRequest) (*SuccessResponse, error)
+	GetFile(context.Context, *FileRequest) (*GetFileResponse, error)
+	DeleteFile(context.Context, *FileRequest) (*SuccessResponse, error)
+	GetAllFiles(context.Context, *TokenRequest) (*GetFilesResponse, error)
 	mustEmbedUnimplementedStorageServiceServer()
 }
 
@@ -88,14 +102,17 @@ type StorageServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedStorageServiceServer struct{}
 
-func (UnimplementedStorageServiceServer) UploadFile(context.Context, *UploadRequest) (*ResultResponse, error) {
+func (UnimplementedStorageServiceServer) UploadFile(context.Context, *UploadRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
 }
-func (UnimplementedStorageServiceServer) DownloadFile(context.Context, *FileRequest) (*DownloadResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DownloadFile not implemented")
+func (UnimplementedStorageServiceServer) GetFile(context.Context, *FileRequest) (*GetFileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFile not implemented")
 }
-func (UnimplementedStorageServiceServer) DeleteFile(context.Context, *FileRequest) (*ResultResponse, error) {
+func (UnimplementedStorageServiceServer) DeleteFile(context.Context, *FileRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFile not implemented")
+}
+func (UnimplementedStorageServiceServer) GetAllFiles(context.Context, *TokenRequest) (*GetFilesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllFiles not implemented")
 }
 func (UnimplementedStorageServiceServer) mustEmbedUnimplementedStorageServiceServer() {}
 func (UnimplementedStorageServiceServer) testEmbeddedByValue()                        {}
@@ -136,20 +153,20 @@ func _StorageService_UploadFile_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StorageService_DownloadFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageService_GetFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(FileRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StorageServiceServer).DownloadFile(ctx, in)
+		return srv.(StorageServiceServer).GetFile(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: StorageService_DownloadFile_FullMethodName,
+		FullMethod: StorageService_GetFile_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StorageServiceServer).DownloadFile(ctx, req.(*FileRequest))
+		return srv.(StorageServiceServer).GetFile(ctx, req.(*FileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -172,11 +189,29 @@ func _StorageService_DeleteFile_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StorageService_GetAllFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StorageServiceServer).GetAllFiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StorageService_GetAllFiles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StorageServiceServer).GetAllFiles(ctx, req.(*TokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StorageService_ServiceDesc is the grpc.ServiceDesc for StorageService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var StorageService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.StorageService",
+	ServiceName: "storage.StorageService",
 	HandlerType: (*StorageServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -184,12 +219,16 @@ var StorageService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _StorageService_UploadFile_Handler,
 		},
 		{
-			MethodName: "DownloadFile",
-			Handler:    _StorageService_DownloadFile_Handler,
+			MethodName: "GetFile",
+			Handler:    _StorageService_GetFile_Handler,
 		},
 		{
 			MethodName: "DeleteFile",
 			Handler:    _StorageService_DeleteFile_Handler,
+		},
+		{
+			MethodName: "GetAllFiles",
+			Handler:    _StorageService_GetAllFiles_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
