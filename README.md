@@ -1,4 +1,4 @@
-# Web Socket Chat with File Storage and gRPC
+# File Storage
 
 ---
 
@@ -21,7 +21,7 @@
 
 ## Tech Stack
 
-| Libs                                                                         |
-|---------------------|--------------------------------------------------------|
+| Component  | Library |
+|-----------|---------|
 | gRPC                | [grpc-go](https://grpc.io/docs/languages/go/)          |
 | REST                | [Echo](https://echo.labstack.com/)                     |
